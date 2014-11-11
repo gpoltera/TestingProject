@@ -8,13 +8,9 @@ package test;
 import crypto.ECDH;
 import java.math.BigInteger;
 import java.security.KeyPair;
-import java.security.spec.EllipticCurve;
 import javax.crypto.SecretKey;
-import org.bouncycastle.jce.interfaces.ECPrivateKey;
 import org.bouncycastle.jce.interfaces.ECPublicKey;
 import org.bouncycastle.math.ec.ECFieldElement;
-import org.bouncycastle.math.ec.ECFieldElement.Fp;
-import org.bouncycastle.math.ec.ECPoint;
 
 /**
  *

@@ -29,7 +29,7 @@ public class WebcamHandler {
  	}
  	
  	private boolean isOpen() {
- 		boolean isOpen = false;
+ 		boolean isOpen;
  		try { isOpen = this.webcam.isOpen();
  		} catch (Exception e) {
  			isOpen = false;

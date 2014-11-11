@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package diverses;
+package old;
 
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
@@ -20,6 +20,8 @@ import java.security.spec.EllipticCurve;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.math.ec.ECCurve;
+import org.bouncycastle.math.ec.ECPoint;
 
 /**
  *
@@ -48,7 +50,7 @@ public class ECDH256 {
 
     private ECParameterSpec getECParameterSpec() {
         ECField field = new ECFieldFp(Q);
-        EllipticCurve curve = new EllipticCurve(field,A,B); //field, a, b, seed
+        EllipticCurve curve2 = new EllipticCurve(field,A,B); //field, a, b, seed
         
         
         ECCurve curve = new ECCurve.F2m(239, 36, A, B); //a, b
@@ -57,9 +59,9 @@ public class ECDH256 {
         System.out.println(curve.getOrder());
         System.out.println(curve.getField().getCharacteristic());
         ECPoint g = curve.createPoint(GX, GY);
-        ECParameterSpec ecSpec = new ECParameterSpec(curve, g, Q); //curve, g, n, h, seed
+        //ECParameterSpec ecSpec = new ECParameterSpec(curve, g, Q); //curve, g, n, h, seed
 
-        return ecSpec;
+        return null;
     }
 
     public KeyPair getKeyPair() {
