@@ -1,5 +1,8 @@
 package webserver;
 import java.io.IOException;
+import old.ClientAuthentication;
+import old.ClientChunkEncodedPost;
+import old.ClientMultipartFormPost;
 
 import org.apache.http.client.ClientProtocolException;
 

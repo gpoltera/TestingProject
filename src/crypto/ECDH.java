@@ -5,11 +5,8 @@
  */
 package crypto;
 
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -20,19 +17,11 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.crypto.KeyAgreement;
 import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
-import org.bouncycastle.crypto.CipherParameters;
-import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
-import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.interfaces.ECPublicKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -95,13 +84,5 @@ public class ECDH {
             Logger.getLogger(ECDH.class.getName()).log(Level.SEVERE, null, ex);
         }
         return remotePublicKey;
-    }
-
-    public byte[] convertTo128(SecretKey secretKey) {
-        PKCS5S2ParametersGenerator parameterGenerator = new PKCS5S2ParametersGenerator(new SHA256Digest());
-        parameterGenerator.init(secretKey.getEncoded(), "salt".getBytes(), 4096);
-        byte[] derivatedKey = ((KeyParameter) parameterGenerator.generateDerivedParameters(128)).getKey();
-        
-        return derivatedKey;
     }
 }
