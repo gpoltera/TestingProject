@@ -34,7 +34,7 @@ public class AES {
         byte[] encryption = null;
         try {           
             SecretKeySpec key = new SecretKeySpec(keyBytes, "AES");
-            Cipher cipher = Cipher.getInstance(Mode, "BC");
+            Cipher cipher = Cipher.getInstance(Mode, BouncyCastleProvider.PROVIDER_NAME);
             cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(iv));
             cipher.doFinal(p);
         } catch (NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
