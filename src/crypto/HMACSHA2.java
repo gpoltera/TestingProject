@@ -9,6 +9,7 @@ import java.math.BigInteger;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.params.KeyParameter;
 
 /**
@@ -27,6 +28,8 @@ public class HMACSHA2 {
 
     public byte[] getDerivatedKey(byte[] key) {
         Digest digest = new SHA256Digest();
+        new SHA512Digest();
+        
         HMac mac = new HMac(digest);
         mac.init(new KeyParameter(key));
         mac.update(inputBuffer, 0, inputBuffer.length);

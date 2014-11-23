@@ -5,7 +5,6 @@
  */
 package test;
 
-import com.sun.org.apache.xml.internal.security.utils.Base64;
 import crypto.ECDH;
 import crypto.HMacSHA;
 import helpers.Base32;
