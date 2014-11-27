@@ -22,13 +22,13 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  */
 public class AESGCM {
 
-    GCMBlockCipher encryptCipher = null;
-    GCMBlockCipher decryptCipher = null;
-    byte[] inputBuffer = new byte[16];
-    byte[] outputBuffer = new byte[512];
-    byte[] key = null;
-    byte[] iv = null;
-    int blockSize = 16;
+    private GCMBlockCipher encryptCipher = null;
+    private GCMBlockCipher decryptCipher = null;
+    private byte[] inputBuffer = new byte[16];
+    private byte[] outputBuffer = new byte[512];
+    private byte[] key = null;
+    private byte[] iv = null;
+    private int blockSize = 16;
 
     public AESGCM(byte[] key, byte[] iv) {
         this.key = new byte[key.length];
