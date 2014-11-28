@@ -19,6 +19,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -58,8 +59,8 @@ public class newgui extends Application {
         this.stage = stage;
         stage.setTitle("XClavis");
         stage.setResizable(false);
-        stage.setMinHeight(650);
-        stage.setMaxHeight(650);
+        stage.setMinHeight(750);
+        stage.setMaxHeight(750);
         stage.setMinWidth(650);
         stage.setMaxWidth(650);
         //stage.getIcons().add(new Image(Start.class.getResourceAsStream("logo.jpg")));
@@ -117,7 +118,7 @@ public class newgui extends Application {
         Button btnQRScanner = new Button("QR-Code scannen");
         btnQRScanner.setGraphic(new ImageView("file:icons/camera1.png"));
         btnQRScanner.setMaxWidth(Double.MAX_VALUE);
-        Button btnKeyList = new Button("Schlüsselliste anzeigen");
+        Button btnKeyList = new Button("Schlüssel austauschen");
         btnKeyList.setGraphic(new ImageView("file:icons/key5.png"));
         btnKeyList.setMaxWidth(Double.MAX_VALUE);
         tileToolBar.getChildren().addAll(btnOpenFile, btnQRScanner, btnKeyList);
@@ -177,6 +178,9 @@ public class newgui extends Application {
         Text outputPathTxt = new Text("Zielordner:");
         lblOutputPath = new Label();
         lblOutputPath.setDisable(true);
+        
+        CheckBox cbCompression = new CheckBox("Dateien vor der Verschlüsselung komprimieren");
+        cbCompression.setSelected(true);
 
         //Button Encryption
         btnEncryption = new Button("Verschlüsseln");
@@ -184,11 +188,12 @@ public class newgui extends Application {
         btnEncryption.setDisable(true);
         btnEncryption.setOnAction(
                 (event) -> {
+                    vbTop.getChildren().remove(tileToolBar);
                     ObservableList test = tableView.getItems();
-                    new Encryption(test, System.getProperty("user.home") + File.separator + "test.zip");
+                    mainPane.setCenter(new Encryption(test, System.getProperty("user.home") + File.separator + "test.zip", cbCompression.selectedProperty().getValue()).showContent());
                 });
 
-        vbContent.getChildren().addAll(txtTop, txtMiddle, tableView, outputPathTxt, lblOutputPath, btnEncryption);
+        vbContent.getChildren().addAll(txtTop, txtMiddle, tableView, outputPathTxt, lblOutputPath, cbCompression, btnEncryption);
 
         mainPane.setCenter(vbContent);
         Scene scene = new Scene(mainPane);

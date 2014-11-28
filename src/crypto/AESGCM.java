@@ -5,92 +5,77 @@
  */
 package crypto;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.engines.AESEngine;
+import org.bouncycastle.crypto.io.CipherInputStream;
+import org.bouncycastle.crypto.io.CipherOutputStream;
+import org.bouncycastle.crypto.io.InvalidCipherTextIOException;
+import org.bouncycastle.crypto.modes.AEADBlockCipher;
 import org.bouncycastle.crypto.modes.GCMBlockCipher;
+import org.bouncycastle.crypto.params.AEADParameters;
 import org.bouncycastle.crypto.params.KeyParameter;
-import org.bouncycastle.crypto.params.ParametersWithIV;
 
 /**
  *
  * @author Gian
  */
 public class AESGCM {
-
-    private GCMBlockCipher encryptCipher = null;
-    private GCMBlockCipher decryptCipher = null;
-    private byte[] inputBuffer = new byte[16];
-    private byte[] outputBuffer = new byte[512];
-    private byte[] key = null;
-    private byte[] iv = null;
-    private int blockSize = 16;
+    private static final byte[] block = new byte[16];
+    private final AEADParameters cipherParameters;
 
     public AESGCM(byte[] key, byte[] iv) {
-        this.key = new byte[key.length];
-        System.arraycopy(key, 0, this.key, 0, key.length);
-
-        this.iv = new byte[iv.length];
-        System.arraycopy(iv, 0, this.iv, 0, iv.length);
-    }
-
-    public void InitCiphers() {
-        encryptCipher = new GCMBlockCipher(new AESEngine());
-        decryptCipher = new GCMBlockCipher(new AESEngine());
-        ParametersWithIV parameterIV = new ParametersWithIV(new KeyParameter(key), iv);
-        encryptCipher.init(true, parameterIV);
-        decryptCipher.init(false, parameterIV);
-    }
-
-    public void Encrypt(InputStream in, OutputStream out) {
-        try {
-            int noBytesRead = 0;        //number of bytes read from input
-            int noBytesProcessed = 0;   //number of bytes processed
-
-            while ((noBytesRead = in.read(inputBuffer)) >= 0) {
-                noBytesProcessed = encryptCipher.processBytes(inputBuffer, 0, noBytesRead, outputBuffer, 0);
-                out.write(outputBuffer, 0, noBytesProcessed);
-            }
-
-            noBytesProcessed = encryptCipher.doFinal(outputBuffer, 0);
-            out.write(outputBuffer, 0, noBytesProcessed);
-            out.flush();
-            in.close();
-            out.close();
-        } catch (IOException | IllegalStateException | InvalidCipherTextException ex) {
-            Logger.getLogger(AESGCM.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    public void Decrypt(InputStream in, OutputStream out) {
-        try {
-            int noBytesRead = 0;        //number of bytes read from input
-            int noBytesProcessed = 0;   //number of bytes processed 
-
-            while ((noBytesRead = in.read(inputBuffer)) >= 0) {
-                noBytesProcessed = decryptCipher.processBytes(inputBuffer, 0, noBytesRead, outputBuffer, 0);
-                out.write(outputBuffer, 0, noBytesProcessed);
-            }
-            noBytesProcessed = decryptCipher.doFinal(outputBuffer, 0);
-            out.write(outputBuffer, 0, noBytesProcessed);
-            out.flush();
-            in.close();
-            out.close();
-        } catch (IOException | IllegalStateException | InvalidCipherTextException ex) {
-            Logger.getLogger(AESGCM.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        this.cipherParameters = new AEADParameters(new KeyParameter(key), 128, iv);
     }
     
-    public void resetCiphers() {
-        if (encryptCipher != null) {
-            encryptCipher.reset();
+    public boolean encrypt(byte[] input, String output) {
+        try {
+            AEADBlockCipher cipher = new GCMBlockCipher(new AESEngine());
+            cipher.init(true, cipherParameters);
+
+            try (FileOutputStream fos = new FileOutputStream(output);
+                    DataOutputStream dos = new DataOutputStream(fos);
+                    //BufferedOutputStream bos = new BufferedOutputStream(fos);
+                    CipherOutputStream cos = new CipherOutputStream(dos, cipher)) {
+                cos.write(input);   
+            }  
+            
+            
+            return true;
+        } catch (IOException ex) {
+            Logger.getLogger(AESGCM.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
-        if (decryptCipher != null) {
-            decryptCipher.reset();
+    }
+
+    public boolean decrypt(String input, String output) {
+        try {
+            AEADBlockCipher cipher = new GCMBlockCipher(new AESEngine());
+            cipher.init(false, cipherParameters);
+
+            try (FileInputStream fis = new FileInputStream(input);
+                    CipherInputStream cis = new CipherInputStream(fis, cipher);
+                    FileOutputStream fos = new FileOutputStream(output)) {
+                int i;
+                while ((i = cis.read(block)) != -1) {
+                    fos.write(block, 0, i);
+                }
+            }
+            return true;
+        } catch (InvalidCipherTextIOException ex) {
+            //System.out.println("Hash for the file is not correct!");
+            return false;
+        } catch (IOException ex) {
+            Logger.getLogger(AESGCM.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
     }
 }

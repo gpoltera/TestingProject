@@ -14,9 +14,10 @@ public class RandomGenerator {
 	public static BigInteger getRandom(int bitlength) {
 		BigInteger random = new BigInteger(bitlength, new SecureRandom());
 
-		while (random.bitLength() != bitlength) {
-			random = new BigInteger(bitlength, new SecureRandom());
-		}
+//		while (random.bitLength() != bitlength) {
+//			random = new BigInteger(bitlength, new SecureRandom());
+//		}
+                System.out.println(random.bitLength());
 
 		return random;
 	}
