@@ -27,11 +27,11 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
-import javafx.scene.control.ToolBar;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.TilePane;
@@ -166,7 +166,11 @@ public class newgui extends Application {
             });
             btnDeleteRow.setOnAction(
                     (event) -> {
-                        fileData.remove(p.getValue());
+                        tableView.requestFocus();
+                        tableView.getSelectionModel().select(p.getValue());
+                        tableView.getFocusModel().focus(tableView.getSelectionModel().getSelectedIndex());
+                        fileData.remove(tableView.getSelectionModel().getSelectedItem());
+                        tableView.getSelectionModel().clearSelection();
                     });
 
             return new ReadOnlyObjectWrapper(btnDeleteRow);
@@ -174,11 +178,17 @@ public class newgui extends Application {
         clmDelete.setSortable(false);
 
         tableView.getColumns().addAll(clmIcon, clmName, clmExtension, clmSize, clmDelete);
+        tableView.setOnKeyPressed((event) -> {
+            if (event.getCode() == KeyCode.DELETE) {
+                fileData.remove(tableView.getSelectionModel().getSelectedItem());
+                tableView.getSelectionModel().clearSelection();
+            }
+        });
 
         Text outputPathTxt = new Text("Zielordner:");
         lblOutputPath = new Label();
         lblOutputPath.setDisable(true);
-        
+
         CheckBox cbCompression = new CheckBox("Dateien vor der Verschlüsselung komprimieren");
         cbCompression.setSelected(true);
 
@@ -243,17 +253,26 @@ public class newgui extends Application {
     }
 
     private void loadFile(File file) {
-        if (!file.isDirectory() && file.isFile()) {
-            ImageView fileIcon = getIcon(file);
-            String fileName = getName(file);
-            String fileSize = getSize(file);
-            String fileExtension = getExtension(file);
-
-            SelectedFile selectedFile = new SelectedFile(file, fileIcon, fileName, fileExtension, fileSize);
-            insertValueInTable(selectedFile);
-            lblOutputPath.setDisable(false);
-            lblOutputPath.setText(System.getProperty("user.home"));
-            btnEncryption.setDisable(false);
+        if (!file.isDirectory() && file.isFile() && file.canRead()) {
+            boolean exists = false;
+            for (SelectedFile existingFile : fileData) {
+                if (existingFile.getFile().equals(file)) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) {
+                ImageView fileIcon = getIcon(file);
+                String fileName = getName(file);
+                String fileSize = getSize(file);
+                String fileExtension = getExtension(file);
+                SelectedFile selectedFile = new SelectedFile(file, fileIcon, fileName, fileExtension, fileSize);
+                tableView.setDisable(false);
+                fileData.add(selectedFile);
+                lblOutputPath.setDisable(false);
+                lblOutputPath.setText(System.getProperty("user.home"));
+                btnEncryption.setDisable(false);
+            }
         }
     }
 
@@ -303,10 +322,5 @@ public class newgui extends Application {
         fileExtension = fileExtension.substring(1);
 
         return fileExtension;
-    }
-
-    private void insertValueInTable(SelectedFile selectedFile) {
-        tableView.setDisable(false);
-        fileData.add(selectedFile);
     }
 }
